@@ -2,6 +2,11 @@ import React from 'react'
 
 export default class Todo extends React.Component {
   render() {
-    return null
+    return (
+      <div>
+         <h4> {this.props.todo.name} </h4>
+      </div>
+      
+    )
   }
 }
