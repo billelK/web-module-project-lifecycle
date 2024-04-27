@@ -11,7 +11,8 @@ export default class App extends React.Component {
     this.state= {
       todos: [],
       inputVal: "",
-      message: ""
+      message: "",
+      showAll: true
     }
   }
 
@@ -33,7 +34,7 @@ export default class App extends React.Component {
   onSubmit = (e) => {
     e.preventDefault()
     axios.post(URL,{name: this.state.inputVal})
-      .then(res => this.setState({message: res.data.message}))
+      .then(res => this.setState({todos: [...this.state.todos, res.data.data]}))
     this.setState({inputVal: ""})
 
   }
@@ -41,24 +42,24 @@ export default class App extends React.Component {
   toggleCompleted = (todo) => {
     axios.patch(`${URL}/${todo.id}`)
       .then(res => {
-        console.log(res.data.data)
-        let objectIndex = this.state.todos.findIndex(todo => todo.id === res.data.data.id)
-        console.log(objectIndex);
-        let firstHalf = this.state.todos.slice(0,objectIndex)
-        console.log(firstHalf);
-        let secondHalf = this.state.todos.slice(objectIndex + 1)
-        console.log(secondHalf);
-
-        this.setState({todos: [...firstHalf,res.data.data,...secondHalf]})
+        this.setState({
+          todos: this.state.todos.map(todo => 
+            todo.id === res.data.data.id ? res.data.data : todo
+          )
+        })
       })
       
+  }
+
+  toggleShowAll = () => {
+    this.setState({showAll: !this.state.showAll})
   }
 
   render() {
     return (
       <>
-        <TodoList todos={this.state.todos} toggleCompleted={this.toggleCompleted}/>
-        <Form inputVal={this.state.inputVal} onChange={this.onChange} onSubmit={this.onSubmit}/>
+        <TodoList showAll={this.state.showAll} todos={this.state.todos} toggleCompleted={this.toggleCompleted}/>
+        <Form showAll={this.state.showAll} toggleShowAll={this.toggleShowAll} inputVal={this.state.inputVal} onChange={this.onChange} onSubmit={this.onSubmit}/>
       </>
     )
   }
